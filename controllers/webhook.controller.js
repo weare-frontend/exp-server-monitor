@@ -1,4 +1,5 @@
 const Service = require('../services/webhook.service')
+const lineNotify = require('../helpers/lineNotify')
 
 const methods = {
   async onHook(req, res) {
@@ -7,6 +8,25 @@ const methods = {
       body: req.body,
       status: 'success',
     })
+  },
+
+  async onSend(req, res) {
+    console.log(req.body)
+    // 🟢🔴
+    try {
+      let msg = `
+
+      Brand: Lavagame
+      Function: Withdraw 
+      Status: Up 🟢
+      `
+      await lineNotify.sendMessage(msg)
+      res.success({
+        status: 'success',
+      })
+    } catch (error) {
+      res.error(error)
+    }
   },
 
   async onRandom(req, res) {

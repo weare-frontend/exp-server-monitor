@@ -4,6 +4,7 @@
   "description": "RESTFul API with express on node",
   "main": "index.js",
   "dependencies": {
+    "axios": "^0.21.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -21,7 +22,7 @@
   },
   "scripts": {
     "dev": "nodemon .",
-    "start": "NODE_ENV=production node ."
+    "start": "node index.js"
   },
   "engines": {
     "node": "10.x"
