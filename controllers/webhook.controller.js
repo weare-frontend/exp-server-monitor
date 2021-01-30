@@ -6,25 +6,35 @@ const methods = {
     let data = req.body
     console.log('data: ', data)
     if (data) {
+      let link = {
+        aws: 'https://statuspage.freshping.io/50335-GameProvidersStatus',
+        lava: 'https://statuspage.freshping.io/22022-Lavagamingstatus',
+      }
+      let name = data.webhook_event_data.check_name
+      let isAvail = data.webhook_event_data.check_state_name == 'Available'
+      let time = data.webhook_event_data.check_target_response_time / 1000
       let msg = `
-        Name: ${data.webhook_event_data.check_name}
-        Status: ${data.webhook_event_data.check_state_name == 'Available' ? 'Up 🟢' : 'Down 🔴'}
+        Name: ${name}
+        Status: ${isAvail ? 'Up 🟢' : 'Down 🔴'}
         httpStatus: ${data.webhook_event_data.http_status_code}
         Date: ${dateHelper.toDateTime({ _d: data.webhook_event_created_on })}
-        Check: every ${data.webhook_event_data.check_target_response_time / 1000} minutes
+        Check: every ${time} minute${time > 1 ? 's' : ''}
       `
+      if (!isAvail) {
+        if (name.includes('[AWS]')) {
+          msg += `
+          Link: ${link.aws}
+          `
+        }
+      }
       console.log('msg: ', msg)
       try {
         await lineNotify.sendMessage(msg)
-        res.success({
-          status: 'success',
-        })
       } catch (error) {
-        res.error(error)
+        return res.error(error)
       }
-    } else {
-      res.success()
     }
+    res.success()
   },
 
   async onSend(req, res) {
@@ -41,6 +51,7 @@ const methods = {
 
   async onRandom(req, res) {
     try {
+      let d = new Date()
       if (d.getMinutes() % 2 == 0) {
         res.success({
           status: 'success',
