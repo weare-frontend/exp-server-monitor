@@ -1,30 +1,36 @@
-const Service = require('../services/webhook.service')
 const lineNotify = require('../helpers/lineNotify')
 const dateHelper = require('../helpers/date.helper')
 
 const methods = {
   async onHook(req, res) {
-    console.log(req.body)
-    res.success({
-      date: dateHelper.toDateTime({ _d: '2021-01-30T21:09:01.946224+00:00' }),
-      body: req.body,
-      status: 'success',
-    })
+    let data = req.body
+    console.log('data: ', data)
+    if (data) {
+      let msg = `
+        Name: ${data.webhook_event_data.check_name}
+        Status: ${data.webhook_event_data.check_state_name == 'Available' ? 'Up 🟢' : 'Down 🔴'}
+        httpStatus: ${data.webhook_event_data.http_status_code}
+        Date: ${dateHelper.toDateTime({ _d: data.webhook_event_created_on })}
+        Check: every ${data.webhook_event_data.check_target_response_time / 1000} minutes
+      `
+      console.log('msg: ', msg)
+      try {
+        await lineNotify.sendMessage(msg)
+        res.success({
+          status: 'success',
+        })
+      } catch (error) {
+        res.error(error)
+      }
+    } else {
+      res.success()
+    }
   },
 
   async onSend(req, res) {
     console.log(req.body)
-    // 🟢🔴
     try {
-      // let msg = `
-
-      // Brand: ${}
-      // Function: ${}
-      // Status: Down 🟢
-      // Date: ${}
-      // `
-      let msg = ''
-      await lineNotify.sendMessage(msg)
+      await lineNotify.sendMessage(req.body.message)
       res.success({
         status: 'success',
       })
@@ -35,10 +41,6 @@ const methods = {
 
   async onRandom(req, res) {
     try {
-      let d = new Date()
-      return res.success({
-        status: 'success',
-      })
       if (d.getMinutes() % 2 == 0) {
         res.success({
           status: 'success',
