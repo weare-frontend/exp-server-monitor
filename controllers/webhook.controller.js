@@ -18,13 +18,10 @@ const methods = {
         Status: ${isAvail ? 'Up 🟢' : 'Down 🔴'}
         httpStatus: ${data.webhook_event_data.http_status_code}
         Date: ${dateHelper.toDateTime({ _d: data.webhook_event_created_on })}
-        Check: every ${time} minute${time > 1 ? 's' : ''}
-      `
+        Check: every ${time} minute${time > 1 ? 's' : ''}`
       if (!isAvail) {
         if (name.includes('[AWS]')) {
-          msg += `
-          Link: ${link.aws}
-          `
+          msg += `\n\n🔗 Link: ${link.aws}`
         }
       }
       console.log('msg: ', msg)
