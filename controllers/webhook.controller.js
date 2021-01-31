@@ -13,22 +13,22 @@ const methods = {
       let name = data.webhook_event_data.check_name
       let isAvail = data.webhook_event_data.check_state_name == 'Available'
       let time = data.webhook_event_data.check_target_response_time / 1000
-      let msg = `
+      if (name.includes('[AWS]')) {
+        let msg = `
         Name: ${name}
         Status: ${isAvail ? 'Up 🟢' : 'Down 🔴'}
         httpStatus: ${data.webhook_event_data.http_status_code}
         Date: ${dateHelper.toDateTime({ _d: data.webhook_event_created_on })}
         Check: every ${time} minute${time > 1 ? 's' : ''}`
-      if (!isAvail) {
-        if (name.includes('[AWS]')) {
+        if (!isAvail) {
           msg += `\n\n🔗 Link: ${link.aws}`
         }
-      }
-      console.log('msg: ', msg)
-      try {
-        await lineNotify.sendMessage(msg)
-      } catch (error) {
-        return res.error(error)
+        console.log('msg: ', msg)
+        try {
+          await lineNotify.sendMessage(msg)
+        } catch (error) {
+          return res.error(error)
+        }
       }
     }
     res.success()
